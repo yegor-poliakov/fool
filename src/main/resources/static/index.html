@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>Fool</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class='top-layer'>
+    <div>Game of Fool</div>
+</div>
+
+<div class='back left'>
+    <div class='layer left-top-layer'>
+        <div class='button new-game' onclick='newGame()'></div>
+        <div class='player1-name'>Good boi</div>
+    </div>
+    <div id='trump-layer' class='layer left-bottom-layer'>
+        <div class='trump-card'></div>
+        <div class='deck-card'></div>
+    </div>
+    <div class='player2-name'>Skynet</div>
+</div>
+
+<div class='back right'>
+    <div class='layer player-layer'>
+        <div class='button-cell'>
+            <div class='button' onclick='makeMove(this, player1)'></div>
+        </div>
+        <div id="firstPlayerHand"></div>
+    </div>
+
+    <div id="firstPlayerTable" class='layer table-layer'>
+    </div>
+
+    <div id="secondPlayerTable" class='layer table-layer'>
+    </div>
+
+    <div class='layer player-layer'>
+        <div class='button-cell'>
+            <div class='button' onclick='makeMove(this, player2)'></div>
+        </div>
+        <div id="secondPlayerHand"></div>
+    </div>
+
+</div>
+
+<script type="application/javascript" src="ap.js"></script>
+
+</body>
+</html>
