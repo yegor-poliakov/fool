@@ -11,8 +11,6 @@ public class Deck {
 
     public Deck() {
         deckOfCards = createDeck();
-        /*        secondPlayer.playerName = nameSecondPlayer;*/
-        /*        secondPlayer.isHuman = true;*/
 
         int lowestTrump1 = 11;
         int highestRank1 = 0;
@@ -23,7 +21,6 @@ public class Deck {
             if (deckOfCards.get(0).rank > highestRank1) {
                 highestRank1 = deckOfCards.get(0).rank;
             }
-            deckOfCards.get(0).isVisible = true;
             firstPlayer.playerHand.add(deckOfCards.remove(0));
         }
 
@@ -36,16 +33,18 @@ public class Deck {
             if (deckOfCards.get(0).rank > highestRank2) {
                 highestRank2 = deckOfCards.get(0).rank;
             }
-            deckOfCards.get(0).isVisible = true;
             secondPlayer.playerHand.add(deckOfCards.remove(0));
         }
 
         if (lowestTrump1 < lowestTrump2) {
             firstPlayer.activityStatus = true;
+            firstPlayer.offence = true;
         } else if (highestRank1 > highestRank2) {
             firstPlayer.activityStatus = true;
+            firstPlayer.offence = true;
         } else {
             secondPlayer.activityStatus = true;
+            secondPlayer.offence = true;
         }
         sortHand(firstPlayer);
         sortHand(secondPlayer);
@@ -80,7 +79,6 @@ public class Deck {
             }
         }
         Collections.shuffle(deck);
-        deck.get(35).isVisible = true;
 
         for (Card card : deck) {
             if (deck.get(35).suit == card.suit) {
@@ -90,37 +88,61 @@ public class Deck {
         return deck;
     }
 
-    public Stage makeMove(Player player, Card card) {
-        if (player.activityStatus && card != null) {
-            return attack(player, card);
-        } else if (player.activityStatus && card == null) {
-            return retreat(player, null);
-        } else if (card != null) {
-            return defend(player, card);
-        } else if (card == null){
-            return giveUp(player, null);
-        } else return Stage.Continue;
+    public Stage move(int playerNumber, int cardNumber) throws Exception {
+        Player player;
+        switch (playerNumber) {
+            case 0:
+                player = firstPlayer;
+                break;
+            case 1:
+                player = secondPlayer;
+                break;
+            default:
+                throw new Exception("Someone has tried to feed false data instead of player number");
+        }
+        if (player.offence) {
+            return attack(player, player.playerHand.get(cardNumber));
+        } else {
+            return defend(player, player.playerHand.get(cardNumber));
+        }
+    }
+
+    public Stage move(int playerNumber) throws Exception {
+        Player player;
+        switch (playerNumber) {
+            case 0:
+                player = firstPlayer;
+                break;
+            case 1:
+                player = secondPlayer;
+                break;
+            default:
+                throw new Exception("Someone has tried to feed false data instead of player number");
+        }
+        if (player.offence) {
+            return retreat(player);
+        } else {
+            return giveUp(player);
+        }
     }
 
     public Stage attack(Player player, Card card) {
-        if (player.activityStatus == true) {
-            if (table.size() == 0) {
-                card.inPlay = true;
-                table.add(card);
-                player.playerHand.remove(card);
-                switchPlayers();
-            } else {
-                for (Card tableCard : table) {
-                    if (tableCard.inPlay) {
-                        return Stage.Continue;
-                    }
-                }
-                for (int i = 0; i < table.size(); i++) {
-                    if (card.rank == table.get(i).rank) {
-                        card.inPlay = true;
-                        table.add(card);
-                        switchPlayers();
-                    }
+        if (table.size() == 0) {
+            card.inPlay = true;
+            table.add(card);
+            player.playerHand.remove(card);
+            switchPlayers();
+        } else {
+            for (Card tableCard : table) {
+                tableCard.inPlay = false;
+            }
+            for (int i = 0; i < table.size(); i++) {
+                if (card.rank == table.get(i).rank) {
+                    card.inPlay = true;
+                    table.add(card);
+                    player.playerHand.remove(card);
+                    switchPlayers();
+                    break;
                 }
             }
         }
@@ -128,28 +150,35 @@ public class Deck {
     }
 
     public Stage defend(Player player, Card card) {
-        if (player.activityStatus == true && table.size() > 0) {
-            Card cardAttacking = new Card(-1, Suit.Spades);
-            for (Card tableCard : table) {
-                if (tableCard.inPlay) {
-                    cardAttacking = tableCard;
-                }
+        Card cardAttacking = new Card();
+        for (Card tableCard : table) {
+            if (tableCard.inPlay) {
+                cardAttacking = tableCard;
             }
-            if ((cardAttacking.suit == card.suit && cardAttacking.rank < card.rank) ||
-                    (cardAttacking.suit != card.suit && card.isTrump)) {
-                deactivateCard();
-                table.add(card);
-                player.playerHand.remove(card);
-                switchPlayers();
-            }
+        }
+        if ((cardAttacking.suit == card.suit && cardAttacking.rank < card.rank) ||
+                (cardAttacking.suit != card.suit && card.isTrump)) {
+            deactivateCard();
+            table.add(card);
+            player.playerHand.remove(card);
+            switchPlayers();
         }
         return Stage.Continue;
     }
 
-    public Stage retreat(Player player, Card card) {
-        if (player.activityStatus == true &&
-                findActiveCard() == false &&
-                card == null) {
+    public Stage retreat(Player player) {
+        if (findActiveCard() == false) {
+            table.clear();
+            switchOffender();
+            switchPlayers();
+            return replenish();
+        }
+        return Stage.Continue;
+    }
+
+    public Stage giveUp(Player player) {
+        if (findActiveCard() == true) {
+            player.playerHand.addAll(table);
             table.clear();
             switchPlayers();
             return replenish();
@@ -157,35 +186,34 @@ public class Deck {
         return Stage.Continue;
     }
 
-    public Stage giveUp(Player player, Card card) {
-        if (player.activityStatus == true &&
-                findActiveCard() == true &&
-                card == null) {
-            player.playerHand.addAll(table);
-            table.clear();
-            return replenish();
-        }
-        return Stage.Continue;
-    }
-
     public Stage replenish() {
-        for (int i = 0; i < (6 - firstPlayer.playerHand.size()); i++) {
-            if (deckOfCards.size() > 0) {
-                firstPlayer.playerHand.add(deckOfCards.remove(0));
+        if (firstPlayer.playerHand.size() < 6){
+            int missingCards = 6 - firstPlayer.playerHand.size();
+            for (int i = 0; i < missingCards; i++) {
+                if (deckOfCards.size() > 0) {
+                    firstPlayer.playerHand.add(deckOfCards.remove(0));
+                }
             }
         }
-        for (int i = 0; i < (6 - secondPlayer.playerHand.size()); i++) {
-            if (deckOfCards.size() > 0) {
-                secondPlayer.playerHand.add(deckOfCards.remove(0));
+
+        if (secondPlayer.playerHand.size() < 6){
+            int missingCards = 6 - secondPlayer.playerHand.size();
+            for (int i = 0; i < missingCards; i++) {
+                if (deckOfCards.size() > 0) {
+                    secondPlayer.playerHand.add(deckOfCards.remove(0));
+                }
             }
         }
+
         if (deckOfCards.size() == 0) {
             if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() == 0) {
                 return Stage.Draw;
             }
-            if (firstPlayer.playerHand.size() != 0 && secondPlayer.playerHand.size() == 0) {
+            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 0) {
                 return Stage.Victory;
-            } else {
+            }
+
+            if (firstPlayer.playerHand.size() > 0 && secondPlayer.playerHand.size() == 0) {
                 return Stage.Loss;
             }
         }
@@ -195,6 +223,12 @@ public class Deck {
     public void switchPlayers() {
         firstPlayer.activityStatus = !(firstPlayer.activityStatus);
         secondPlayer.activityStatus = !(secondPlayer.activityStatus);
+    }
+
+    public void switchOffender() {
+        firstPlayer.offence = !(firstPlayer.offence);
+        secondPlayer.offence = !(secondPlayer.offence);
+
     }
 
     public void deactivateCard() {

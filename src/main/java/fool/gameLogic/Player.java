@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Player {
     ArrayList<Card> playerHand;
     boolean activityStatus;
+    boolean offence;
 /*
     public String playerName;
 */
@@ -15,6 +16,7 @@ public class Player {
     public Player() {
         this.activityStatus = false;
         this.playerHand = new ArrayList<Card>();
+        this.offence = false;
 /*
         playerName = "NPC";
 */
@@ -33,6 +35,10 @@ public class Player {
 
     public boolean isActivityStatus() {
         return activityStatus;
+    }
+
+    public boolean isOffence() {
+        return offence;
     }
 
     public void setActivityStatus(boolean activityStatus) {

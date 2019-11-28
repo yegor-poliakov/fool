@@ -24,10 +24,15 @@ public class GameController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/deck", method = RequestMethod.POST)
-    public GameState makeMove(@RequestBody MakeMoveRequest request) throws Exception {
+    public GameState cardMove(@RequestBody MakeMoveRequest request) throws Exception {
         UserGame userGame = gameRepository.findById(request.getDeckID()).get();
         Deck deck = deckConverter.userGameToDeck(userGame);
-        Stage stage = deck.makeMove(request.getPlayer(), request.getCard());
+        Stage stage;
+        if (request.getCardNumber() != -1){
+            stage = deck.move(request.getPlayerNumber(), request.getCardNumber());
+        } else {
+            stage = deck.move(request.getPlayerNumber());
+        }
         UserGame userGameToDB = deckConverter.deckToUserGame(stage, deck);
         userGameToDB.setId(userGame.getId());
         gameRepository.save(userGameToDB);

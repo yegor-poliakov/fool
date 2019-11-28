@@ -58,7 +58,7 @@ public class DeckConverter {
         return deck;
     }
 
-    GameState deckToGameState(long deckID, Stage stage, Deck deck) throws Exception {
+    public GameState deckToGameState(long deckID, Stage stage, Deck deck) throws Exception {
         GameStage gameStage = stageToGameStage(stage);
         return new GameState(deckID, gameStage, deck);
     }

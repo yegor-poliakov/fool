@@ -1,15 +1,37 @@
 package fool.gameLogic;
 
 public class Card {
-    Suit suit;
-    int rank;
-    boolean isVisible;
-    boolean isTrump;
-    boolean inPlay;
+    public Suit suit;
+    public int rank;
+    public boolean isTrump;
+    public boolean inPlay;
+    public Suit trump;
+
+    public Card(){
+
+    }
 
     public Card(int rank, Suit suit) {
         this.rank = rank;
         this.suit = suit;
+        this.isTrump = false;
+        this.inPlay = false;
+    }
+
+    public void setSuit(Suit suit){
+        this.suit = suit;
+    }
+
+    public void setRank(int rank){
+        this.rank = rank;
+    }
+
+    public void setTrump(boolean isTrump){
+        this.isTrump = isTrump;
+    }
+
+    public void setInPlay(boolean inPlay){
+        this.inPlay = inPlay;
     }
 
     public int getRank() {
@@ -18,14 +40,6 @@ public class Card {
 
     public Suit getSuit() {
         return suit;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    public void setVisible(boolean visibility) {
-        this.isVisible = visibility;
     }
 
     public boolean isTrump() {
