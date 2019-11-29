@@ -8,9 +8,24 @@ public class Deck {
     public ArrayList<Card> table = new ArrayList<Card>();
     public Player firstPlayer = new Player();
     public Player secondPlayer = new Player();
+    public String trump;
 
     public Deck() {
         deckOfCards = createDeck();
+        switch (deckOfCards.get(35).suit) {
+            case Spades:
+                trump = "Spades";
+                break;
+            case Diamonds:
+                trump = "Diamonds";
+                break;
+            case Hearts:
+                trump = "Hearts";
+                break;
+            default:
+                trump = "Clubs";
+                break;
+        }
 
         int lowestTrump1 = 11;
         int highestRank1 = 0;
@@ -137,26 +152,32 @@ public class Deck {
             aiResponse = true;
         }
 
-        if (table.size() == 0) {
-            table.add(card);
-            player.playerHand.remove(card);
-            switchPlayers();
-            attackSuccess = true;
-        } else {
-            if ((table.size() % 2 == 0)){
-                for (int i = 0; i < table.size(); i++) {
-                    if (card.rank == table.get(i).rank) {
-                        table.add(card);
-                        player.playerHand.remove(card);
-                        switchPlayers();
-                        attackSuccess = true;
-                        break;
-                    }
-                }
-            } else {
-                return Stage.Continue;
-            }
+        ArrayList<Card> hand1 = firstPlayer.playerHand;
+        ArrayList<Card> hand2 = secondPlayer.playerHand;
 
+        if ((hand1.size() == 0) || (hand2.size() == 0)){
+            return Stage.Continue;
+        } else {
+            if (table.size() == 0) {
+                table.add(card);
+                player.playerHand.remove(card);
+                switchPlayers();
+                attackSuccess = true;
+            } else {
+                if ((table.size() % 2 == 0)){
+                    for (int i = 0; i < table.size(); i++) {
+                        if (card.rank == table.get(i).rank) {
+                            table.add(card);
+                            player.playerHand.remove(card);
+                            switchPlayers();
+                            attackSuccess = true;
+                            break;
+                        }
+                    }
+                } else {
+                    return Stage.Continue;
+                }
+            }
         }
 
         if (aiResponse && attackSuccess) {

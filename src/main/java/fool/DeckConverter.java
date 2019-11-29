@@ -44,6 +44,13 @@ public class DeckConverter {
             return null;
         }
 
+        try {
+            String jsonMap = objectMapper.writeValueAsString(deck.trump);
+            userGame.setTrump(jsonMap);
+        } catch (Exception e) {
+            return null;
+        }
+
         return userGame;
     }
 
@@ -55,6 +62,7 @@ public class DeckConverter {
         deck.table = objectMapper.readValue(userGame.getTable(), deckOfCardsType);
         deck.firstPlayer = objectMapper.readValue(userGame.getFirstPlayer(), Player.class);
         deck.secondPlayer = objectMapper.readValue(userGame.getSecondPlayer(), Player.class);
+        deck.trump = objectMapper.readValue(userGame.getTrump(), String.class);
         return deck;
     }
 

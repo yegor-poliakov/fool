@@ -62,14 +62,15 @@ body {
 }
 
 .card {
+    position: absolute;
     background: url("invisible.png") no-repeat;
     background-size: cover;
     border: #000000 solid 2px;
     border-radius: 10px;
     float: none;
     display: table-cell;
-    width: 89px;
-    height: 140px;
+    width: 88px;
+    height: 135px;
     vertical-align: top;
     index-z: 1;
     margin-left: 10px;
@@ -145,9 +146,9 @@ body {
 
 .player1-name {
     position: absolute;
-    top: 160px;
-    left: 15px;
-    font: 1.5em Verdana;
+    top: 25%;
+    left: 3%;
+    font: 1.2em Verdana;
     color: white;
     font-weight: bold;
     text-align: right;
@@ -155,13 +156,24 @@ body {
 
 .player2-name {
     position: absolute;
-    bottom: 60px;
-    left: 95px;
-    font: 1.5em Verdana;
+    bottom: 11%;
+    left: 9%;
+    font: 1.2em Verdana;
     color: white;
     font-weight: bold;
     text-align: right;
 }
+
+.cards-remaining {
+    position: absolute;
+    top: 72%;
+    left: 2.5%;
+    font: 1em Verdana;
+    color: white;
+    font-weight: bold;
+    text-align: justify;
+}
+
 
 /* Clubs */
 .C6 {

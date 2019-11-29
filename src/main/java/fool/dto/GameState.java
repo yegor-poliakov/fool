@@ -17,6 +17,7 @@ public class GameState {
     private final String[] table;
     private final String trumpCard;
     private final int remainingCards;
+    private final String trump;
 
     public GameState(long deckID, GameStage gameStage, Deck deck){
         this.stage = gameStage;
@@ -34,7 +35,7 @@ public class GameState {
         } else {
             this.trumpCard = null;
         }
-
+        this.trump = deck.trump;
         this.remainingCards = deck.deckOfCards.size();
         this.table = handToString(deck.table);
     }
@@ -134,5 +135,9 @@ public class GameState {
 
     public boolean isSecondPlayerOffender() {
         return secondPlayerOffender;
+    }
+
+    public String getTrump() {
+        return trump;
     }
 }

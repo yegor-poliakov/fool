@@ -29,6 +29,10 @@ public class UserGame implements Serializable {
     @Column(name = "\"table\"")
     private String table;
 
+    @Lob
+    @Column(name = "trump")
+    private String trump;
+
     public UserGame() {
     }
 
@@ -44,7 +48,6 @@ public class UserGame implements Serializable {
     public void setStage(String stage) {
         this.stage = stage;
     }
-
 
     public String getTable() {
         return table;
@@ -81,4 +84,13 @@ public class UserGame implements Serializable {
     public void setId(long id) {
         this.id = id;
     }
+
+    public void setTrump(String trump) {
+        this.trump = trump;
+    }
+
+    public String getTrump() {
+        return trump;
+    }
+
 }

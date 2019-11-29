@@ -3,6 +3,19 @@ const baseURL = "https://foolkyivbased.herokuapp.com/";
 var deckID = 0;
 function render(gameState) {
     deckID = gameState.deckID;
+    var cardsRemaining = gameState.remainingCards;
+    var cardCounter = $('#cards-remaining');
+    cardCounter.empty();
+    var trump = gameState.trump;
+    if(cardsRemaining != 0){
+        var remaining = "";
+        remaining += `<div class='cards-remaining'>Cards to go: ${cardsRemaining}</div>`;
+        cardCounter.append(remaining);
+    } else if (!(trump == undefined)) {
+        var remaining = "";
+        remaining += `<div class='cards-remaining'>Trump: ${trump}</div>`;
+        cardCounter.append(remaining);
+    }
 
     var trumpLayer = $('#trump-layer');
     trumpLayer.empty();
@@ -30,11 +43,18 @@ function render(gameState) {
         var playerNumber = gameState.firstPlayerNumber;
         var playability = "";
         var clickable = "";
+        var firstPlayerPosition = "";
+        var calculateFirstPosition = 200 + column * (652 / PlayerOneRow);
+        if (PlayerOneRow < 6){
+            calculateFirstPosition = 200 + column * 110;
+        }
+
         if (gameState.firstPlayerActive){
             playability += "playable";
-            clickable += `onclick='makeMove(${playerNumber}, ${column})'`
+            clickable += `onclick='makeMove(${playerNumber}, ${column})'`;
         }
-        text = `<div class='card visible ${cardClass} ${playability}' ${clickable}></div>`;
+        firstPlayerPosition += `style="left: ${calculateFirstPosition}px; top: 55px; z-index=${column}"`;
+        text = `<div class='card visible ${cardClass} ${playability}' ${clickable} ${firstPlayerPosition}></div>`;
         firstPlayerHand.append(text);
     }
 
@@ -54,10 +74,25 @@ function render(gameState) {
     var tableLength = gameState.table.length;
     for (var i = 0; i < tableLength; i++){
         var cardClass = gameState.table[i];
-        text = `<div class='card visible ${cardClass}'></div>`;
+        var tablePosition = "";
+        var calculateTablePosition;
+        if (tableLength % 2 == 0){
+            calculateTablePosition = 200 + (i - i % 2) * (652 / 2 * tableLength);
+        }
+        if (tableLength % 2 == 1){
+            calculateTablePosition = 200 + (i - i % 2) * (652 / 2 * (tableLength + 1));
+        }
+        if (tableLength < 16){
+            calculateTablePosition = 200 + (i - i % 2) * 110/2;
+        }
+
         if (i % 2 === 0){
+            tablePosition += `style="left: ${calculateTablePosition}px; margin-top: 10px; z-index=${i}"`;
+            text = `<div class='card visible ${cardClass}' ${tablePosition}></div>`;
             currentTable.append(text);
         } else {
+            tablePosition += `style="left: ${calculateTablePosition}px; margin-top: 10px; z-index=${i}"`;
+            text = `<div class='card visible ${cardClass}' ${tablePosition}></div>`;
             spareTable.append(text);
         }
     }
@@ -76,11 +111,18 @@ function render(gameState) {
         var playerTwoNumber = gameState.secondPlayerNumber;
         var playability = "";
         var clickable = "";
+        var secondPlayerPosition = "";
+        var calculateSecondPosition = 200 + columnTwo * (652 / PlayerTwoRow);
+        if (PlayerTwoRow < 6){
+            calculateSecondPosition = 200 + columnTwo * 110;
+        }
+        text = `<div class='card visible ${cardClass} ${playability}' ${clickable} ${firstPlayerPosition}></div>`;
+        secondPlayerPosition += `style="left: ${calculateSecondPosition}px; bottom: -50px; z-index=${columnTwo}"`;
         if (gameState.secondPlayerActive){
            playability += "playable";
            clickable += `onclick='makeMove(${playerTwoNumber}, ${columnTwo})'`;
         }
-        text = `<div class='card invisible' ${clickable}></div>`;
+        text = `<div class='card invisible' ${clickable} ${secondPlayerPosition}></div>`;
         secondPlayerHand.append(text);
     }
 
@@ -90,7 +132,7 @@ function render(gameState) {
     } else if (gameState.stage === "Loss") {
         alert("Human player lost!");
     } else if (gameState.stage === "Draw"){
-        alert("Draw!");
+        alert("Tie!");
     }
 
     return false;
