@@ -48,6 +48,10 @@ public class Deck {
         }
         sortHand(firstPlayer);
         sortHand(secondPlayer);
+        if (secondPlayer.isActivityStatus()) {
+            int iniCardIndex = pickAttackCard(secondPlayer.playerHand);
+            attack(secondPlayer, secondPlayer.playerHand.get(iniCardIndex));
+        }
     }
 
     public static ArrayList<Card> createDeck() {
@@ -127,67 +131,145 @@ public class Deck {
     }
 
     public Stage attack(Player player, Card card) {
+        boolean aiResponse = false;
+        boolean attackSuccess = false;
+        if (player == firstPlayer) {
+            aiResponse = true;
+        }
+
         if (table.size() == 0) {
-            card.inPlay = true;
             table.add(card);
             player.playerHand.remove(card);
             switchPlayers();
+            attackSuccess = true;
         } else {
-            for (Card tableCard : table) {
-                tableCard.inPlay = false;
+            if ((table.size() % 2 == 0)){
+                for (int i = 0; i < table.size(); i++) {
+                    if (card.rank == table.get(i).rank) {
+                        table.add(card);
+                        player.playerHand.remove(card);
+                        switchPlayers();
+                        attackSuccess = true;
+                        break;
+                    }
+                }
+            } else {
+                return Stage.Continue;
             }
-            for (int i = 0; i < table.size(); i++) {
-                if (card.rank == table.get(i).rank) {
-                    card.inPlay = true;
-                    table.add(card);
-                    player.playerHand.remove(card);
-                    switchPlayers();
-                    break;
+
+        }
+
+        if (aiResponse && attackSuccess) {
+            boolean effectiveDefence = false;
+            if (secondPlayer.playerHand.size() > 0) {
+                if (pickDefenceCard(secondPlayer.playerHand, card) != -1) {
+                    effectiveDefence = true;
+                    int defCardIndex = pickDefenceCard(secondPlayer.playerHand, card);
+                    defend(secondPlayer, secondPlayer.playerHand.get(defCardIndex));
                 }
             }
+
+            if (!effectiveDefence) {
+                giveUp(secondPlayer);
+            }
         }
+
         return Stage.Continue;
     }
 
     public Stage defend(Player player, Card card) {
-        Card cardAttacking = new Card();
-        for (Card tableCard : table) {
-            if (tableCard.inPlay) {
-                cardAttacking = tableCard;
-            }
+        boolean aiResponse = false;
+        if (player == firstPlayer) {
+            aiResponse = true;
         }
+
+        Card cardAttacking = new Card();
+        if(table.size() % 2 == 1){
+            cardAttacking = table.get(table.size() - 1);
+        }
+
         if ((cardAttacking.suit == card.suit && cardAttacking.rank < card.rank) ||
                 (cardAttacking.suit != card.suit && card.isTrump)) {
-            deactivateCard();
             table.add(card);
             player.playerHand.remove(card);
             switchPlayers();
         }
+
+        if (aiResponse) {
+            boolean effectiveAttack = false;
+            if (secondPlayer.playerHand.size() > 0) {
+                if (pickAttackCard(secondPlayer.playerHand) != -1) {
+                    effectiveAttack = true;
+                    int attCardIndex = pickAttackCard(secondPlayer.playerHand);
+                    attack(secondPlayer, secondPlayer.playerHand.get(attCardIndex));
+                }
+            }
+
+            if (!effectiveAttack) {
+                retreat(secondPlayer);
+            }
+        }
+
         return Stage.Continue;
     }
 
+
     public Stage retreat(Player player) {
-        if (findActiveCard() == false) {
+        boolean aiResponse = false;
+        if (player == firstPlayer) {
+            aiResponse = true;
+        }
+
+        if (table.size() % 2 == 0) {
             table.clear();
             switchOffender();
             switchPlayers();
-            return replenish();
+            replenish();
         }
-        return Stage.Continue;
+
+        if(endGame() != Stage.Continue){
+            return endGame();
+        }
+
+        if (aiResponse) {
+            if (secondPlayer.playerHand.size() > 0) {
+                int attCardIndex = pickAttackCard(secondPlayer.playerHand);
+                attack(secondPlayer, secondPlayer.playerHand.get(attCardIndex));
+            }
+        }
+
+        return endGame();
     }
 
     public Stage giveUp(Player player) {
-        if (findActiveCard() == true) {
+        boolean aiResponse = false;
+        if (player == firstPlayer) {
+            aiResponse = true;
+        }
+
+        if (table.size() % 2 == 1) {
             player.playerHand.addAll(table);
             table.clear();
             switchPlayers();
-            return replenish();
+            replenish();
         }
-        return Stage.Continue;
+
+        if(endGame() != Stage.Continue){
+            return endGame();
+        }
+
+        if (aiResponse) {
+            if (secondPlayer.playerHand.size() > 0) {
+                int attCardIndex = pickAttackCard(secondPlayer.playerHand);
+                attack(secondPlayer, secondPlayer.playerHand.get(attCardIndex));
+            }
+        }
+
+        return endGame();
     }
 
     public Stage replenish() {
-        if (firstPlayer.playerHand.size() < 6){
+        if (firstPlayer.playerHand.size() < 6) {
             int missingCards = 6 - firstPlayer.playerHand.size();
             for (int i = 0; i < missingCards; i++) {
                 if (deckOfCards.size() > 0) {
@@ -196,7 +278,7 @@ public class Deck {
             }
         }
 
-        if (secondPlayer.playerHand.size() < 6){
+        if (secondPlayer.playerHand.size() < 6) {
             int missingCards = 6 - secondPlayer.playerHand.size();
             for (int i = 0; i < missingCards; i++) {
                 if (deckOfCards.size() > 0) {
@@ -204,11 +286,20 @@ public class Deck {
                 }
             }
         }
+        return Stage.Continue;
+    }
 
+    public void switchPlayers() {
+        firstPlayer.activityStatus = !(firstPlayer.activityStatus);
+        secondPlayer.activityStatus = !(secondPlayer.activityStatus);
+    }
+
+    public Stage endGame() {
         if (deckOfCards.size() == 0) {
             if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() == 0) {
                 return Stage.Draw;
             }
+
             if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 0) {
                 return Stage.Victory;
             }
@@ -220,10 +311,6 @@ public class Deck {
         return Stage.Continue;
     }
 
-    public void switchPlayers() {
-        firstPlayer.activityStatus = !(firstPlayer.activityStatus);
-        secondPlayer.activityStatus = !(secondPlayer.activityStatus);
-    }
 
     public void switchOffender() {
         firstPlayer.offence = !(firstPlayer.offence);
@@ -231,24 +318,68 @@ public class Deck {
 
     }
 
-    public void deactivateCard() {
-        for (Card tableCard : table) {
-            if (tableCard.inPlay) {
-                tableCard.inPlay = false;
-            }
-        }
-    }
-
-    public boolean findActiveCard() {
-        for (Card tableCard : table) {
-            if (tableCard.inPlay) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void sortHand(Player player) {
         Collections.sort(player.playerHand, new CardComparator());
     }
+
+    public int pickDefenceCard(ArrayList<Card> hand, Card actionCard) {
+        int lowestDefenceCard = -1;
+        CardComparator cardComparator = new CardComparator();
+        for (int i = 0; i < hand.size(); i++) {
+            if ((cardComparator.compare(hand.get(i), actionCard) == 1)) {
+                lowestDefenceCard = i;
+                break;
+            }
+        }
+
+        if (lowestDefenceCard != -1) {
+            for (int i = 0; i < hand.size(); i++) {
+                if ((cardComparator.compare(hand.get(i), actionCard) == 1)) {
+                    if (cardComparator.compare(hand.get(i), hand.get(lowestDefenceCard)) == -1) {
+                        lowestDefenceCard = i;
+                    }
+                }
+            }
+        }
+
+        return lowestDefenceCard;
+    }
+
+    public int pickAttackCard(ArrayList<Card> hand) {
+        int lowestAttackCard = -1;
+        CardComparator cardComparator = new CardComparator();
+
+        if (table.size() == 0) {
+            lowestAttackCard = 0;
+            for (int i = 0; i < hand.size(); i++) {
+                if (cardComparator.compare(hand.get(i), hand.get(lowestAttackCard)) == -1) {
+                    lowestAttackCard = i;
+                }
+            }
+        } else {
+            for (int i = 0; i < hand.size(); i++) {
+                for (int j = 0; j < table.size(); j++) {
+                    if (hand.get(i).rank == table.get(j).rank) {
+                        lowestAttackCard = i;
+                        break;
+                    }
+                }
+            }
+
+            if (lowestAttackCard != -1) {
+                for (int i = 0; i < hand.size(); i++) {
+                    for (int j = 0; j < table.size(); j++) {
+                        if (hand.get(i).rank == table.get(j).rank) {
+                            if (cardComparator.compare(hand.get(i), hand.get(lowestAttackCard)) == -1) {
+                                lowestAttackCard = i;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return lowestAttackCard;
+    }
+
 }

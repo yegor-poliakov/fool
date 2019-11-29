@@ -146,7 +146,7 @@ body {
 .player1-name {
     position: absolute;
     top: 160px;
-    left: 70px;
+    left: 15px;
     font: 1.5em Verdana;
     color: white;
     font-weight: bold;
@@ -155,7 +155,7 @@ body {
 
 .player2-name {
     position: absolute;
-    bottom: 160px;
+    bottom: 60px;
     left: 95px;
     font: 1.5em Verdana;
     color: white;

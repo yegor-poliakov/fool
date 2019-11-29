@@ -27,6 +27,7 @@ public class GameController {
     public GameState cardMove(@RequestBody MakeMoveRequest request) throws Exception {
         UserGame userGame = gameRepository.findById(request.getDeckID()).get();
         Deck deck = deckConverter.userGameToDeck(userGame);
+        long deckID = request.getDeckID();
         Stage stage;
         if (request.getCardNumber() != -1){
             stage = deck.move(request.getPlayerNumber(), request.getCardNumber());

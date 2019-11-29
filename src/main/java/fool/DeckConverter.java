@@ -72,6 +72,8 @@ public class DeckConverter {
                 return GameStage.Victory;
             case Loss:
                 return GameStage.Loss;
+            case Draw:
+                return GameStage.Draw;
             default:
                 throw new Exception("Someone has messed with the code! Check GameStage ENUM");
         }

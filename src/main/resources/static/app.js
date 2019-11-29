@@ -1,5 +1,5 @@
-/*const baseURL = "http://localhost:8080/";*/
-const baseURL = "https://foolkyivbased.herokuapp.com/";
+const baseURL = "http://localhost:8080/";
+/*const baseURL = "https://foolkyivbased.herokuapp.com/";*/
 var deckID = 0;
 function render(gameState) {
     deckID = gameState.deckID;
@@ -80,7 +80,7 @@ function render(gameState) {
            playability += "playable";
            clickable += `onclick='makeMove(${playerTwoNumber}, ${columnTwo})'`;
         }
-        text = `<div class='card visible ${cardClass} ${playability}' ${clickable}></div>`;
+        text = `<div class='card invisible' ${clickable}></div>`;
         secondPlayerHand.append(text);
     }
 
@@ -88,7 +88,9 @@ function render(gameState) {
         alert("You won!");
 
     } else if (gameState.stage === "Loss") {
-        alert("You lost!");
+        alert("Human player lost!");
+    } else if (gameState.stage === "Draw"){
+        alert("Draw!");
     }
 
     return false;
