@@ -155,7 +155,7 @@ public class Deck {
         ArrayList<Card> hand1 = firstPlayer.playerHand;
         ArrayList<Card> hand2 = secondPlayer.playerHand;
 
-        if ((hand1.size() == 0) || (hand2.size() == 0)){
+        if ((hand1.size() == 0) || (hand2.size() == 0)) {
             return Stage.Continue;
         } else {
             if (table.size() == 0) {
@@ -164,7 +164,7 @@ public class Deck {
                 switchPlayers();
                 attackSuccess = true;
             } else {
-                if ((table.size() % 2 == 0)){
+                if ((table.size() % 2 == 0)) {
                     for (int i = 0; i < table.size(); i++) {
                         if (card.rank == table.get(i).rank) {
                             table.add(card);
@@ -205,7 +205,7 @@ public class Deck {
         }
 
         Card cardAttacking = new Card();
-        if(table.size() % 2 == 1){
+        if (table.size() % 2 == 1) {
             cardAttacking = table.get(table.size() - 1);
         }
 
@@ -248,7 +248,7 @@ public class Deck {
             replenish();
         }
 
-        if(endGame() != Stage.Continue){
+        if (endGame() != Stage.Continue) {
             return endGame();
         }
 
@@ -275,7 +275,7 @@ public class Deck {
             replenish();
         }
 
-        if(endGame() != Stage.Continue){
+        if (endGame() != Stage.Continue) {
             return endGame();
         }
 
@@ -290,23 +290,38 @@ public class Deck {
     }
 
     public Stage replenish() {
-        if (firstPlayer.playerHand.size() < 6) {
-            int missingCards = 6 - firstPlayer.playerHand.size();
-            for (int i = 0; i < missingCards; i++) {
-                if (deckOfCards.size() > 0) {
-                    firstPlayer.playerHand.add(deckOfCards.remove(0));
+        Player offender = firstPlayer;
+        Player defender = secondPlayer;
+        if (firstPlayer.isOffence()) {
+            offender = firstPlayer;
+            defender = secondPlayer;
+        } else if (secondPlayer.isOffence()) {
+            offender = secondPlayer;
+            defender = firstPlayer;
+        }
+
+        int missingCards = 0;
+        if (6 - firstPlayer.playerHand.size() > 0){
+            missingCards += 6 - firstPlayer.playerHand.size();
+        }
+        if (6 - secondPlayer.playerHand.size() > 0){
+            missingCards += 6 - secondPlayer.playerHand.size();
+        }
+
+        for (int i = 0; i < missingCards; i++) {
+            if (deckOfCards.size() > 0) {
+                if (offender.playerHand.size() < 6) {
+                    offender.playerHand.add(deckOfCards.remove(0));
+                } else if (defender.playerHand.size() < 6){
+                    defender.playerHand.add(deckOfCards.remove(0));
                 }
+                Player interLude;
+                interLude = defender;
+                defender = offender;
+                offender = interLude;
             }
         }
 
-        if (secondPlayer.playerHand.size() < 6) {
-            int missingCards = 6 - secondPlayer.playerHand.size();
-            for (int i = 0; i < missingCards; i++) {
-                if (deckOfCards.size() > 0) {
-                    secondPlayer.playerHand.add(deckOfCards.remove(0));
-                }
-            }
-        }
         return Stage.Continue;
     }
 

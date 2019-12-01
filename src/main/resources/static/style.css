@@ -146,8 +146,8 @@ body {
 
 .player1-name {
     position: absolute;
-    top: 25%;
-    left: 3%;
+    top: 23%;
+    left: 1%;
     font: 1.2em Verdana;
     color: white;
     font-weight: bold;
@@ -156,8 +156,8 @@ body {
 
 .player2-name {
     position: absolute;
-    bottom: 11%;
-    left: 9%;
+    bottom: 12%;
+    left: 7%;
     font: 1.2em Verdana;
     color: white;
     font-weight: bold;

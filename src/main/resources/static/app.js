@@ -1,5 +1,5 @@
-/*const baseURL = "http://localhost:8080/";*/
-const baseURL = "https://foolkyivbased.herokuapp.com/";
+const baseURL = "http://localhost:8080/";
+/*const baseURL = "https://foolkyivbased.herokuapp.com/";*/
 var deckID = 0;
 function render(gameState) {
     deckID = gameState.deckID;
@@ -53,7 +53,7 @@ function render(gameState) {
             playability += "playable";
             clickable += `onclick='makeMove(${playerNumber}, ${column})'`;
         }
-        firstPlayerPosition += `style="left: ${calculateFirstPosition}px; top: 55px; z-index=${column}"`;
+        firstPlayerPosition += `style="left: ${calculateFirstPosition}px; margin-top: 0.8%; z-index=${column}"`;
         text = `<div class='card visible ${cardClass} ${playability}' ${clickable} ${firstPlayerPosition}></div>`;
         firstPlayerHand.append(text);
     }
@@ -117,7 +117,7 @@ function render(gameState) {
             calculateSecondPosition = 200 + columnTwo * 110;
         }
         text = `<div class='card visible ${cardClass} ${playability}' ${clickable} ${firstPlayerPosition}></div>`;
-        secondPlayerPosition += `style="left: ${calculateSecondPosition}px; bottom: -50px; z-index=${columnTwo}"`;
+        secondPlayerPosition += `style="left: ${calculateSecondPosition}px; margin-top: 1%; z-index=${columnTwo}"`;
         if (gameState.secondPlayerActive){
            playability += "playable";
            clickable += `onclick='makeMove(${playerTwoNumber}, ${columnTwo})'`;
