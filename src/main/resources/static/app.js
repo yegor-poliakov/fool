@@ -1,5 +1,5 @@
-const baseURL = "http://localhost:8080/";
-/*const baseURL = "https://foolkyivbased.herokuapp.com/";*/
+/*const baseURL = "http://localhost:8080/";*/
+const baseURL = "https://foolkyivbased.herokuapp.com/";
 var deckID = 0;
 function render(gameState) {
     deckID = gameState.deckID;
