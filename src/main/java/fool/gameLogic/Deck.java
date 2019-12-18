@@ -155,28 +155,27 @@ public class Deck {
         ArrayList<Card> hand1 = firstPlayer.playerHand;
         ArrayList<Card> hand2 = secondPlayer.playerHand;
 
-        if ((hand1.size() == 0) || (hand2.size() == 0)) {
-            return Stage.Continue;
+        if (table.size() == 0) {
+            table.add(card);
+            player.playerHand.remove(card);
+            switchPlayers();
+            attackSuccess = true;
         } else {
-            if (table.size() == 0) {
-                table.add(card);
-                player.playerHand.remove(card);
-                switchPlayers();
-                attackSuccess = true;
-            } else {
-                if ((table.size() % 2 == 0)) {
-                    for (int i = 0; i < table.size(); i++) {
-                        if (card.rank == table.get(i).rank) {
-                            table.add(card);
-                            player.playerHand.remove(card);
-                            switchPlayers();
-                            attackSuccess = true;
-                            break;
+            if ((table.size() % 2 == 0)) {
+                for (int i = 0; i < table.size(); i++) {
+                    if (card.rank == table.get(i).rank) {
+                        table.add(card);
+                        player.playerHand.remove(card);
+                        switchPlayers();
+                        attackSuccess = true;
+                        if (endGame() != Stage.Continue) {
+                            return endGame();
                         }
+                        break;
                     }
-                } else {
-                    return Stage.Continue;
                 }
+            } else {
+                return Stage.Continue;
             }
         }
 
@@ -214,11 +213,14 @@ public class Deck {
             table.add(card);
             player.playerHand.remove(card);
             switchPlayers();
+            if (endGame() != Stage.Continue) {
+                return endGame();
+            }
         }
 
         if (aiResponse) {
             boolean effectiveAttack = false;
-            if (secondPlayer.playerHand.size() > 0) {
+            if (secondPlayer.playerHand.size() > 0 && table.size() < 11) {
                 if (pickAttackCard(secondPlayer.playerHand) != -1) {
                     effectiveAttack = true;
                     int attCardIndex = pickAttackCard(secondPlayer.playerHand);
@@ -301,10 +303,10 @@ public class Deck {
         }
 
         int missingCards = 0;
-        if (6 - firstPlayer.playerHand.size() > 0){
+        if (6 - firstPlayer.playerHand.size() > 0) {
             missingCards += 6 - firstPlayer.playerHand.size();
         }
-        if (6 - secondPlayer.playerHand.size() > 0){
+        if (6 - secondPlayer.playerHand.size() > 0) {
             missingCards += 6 - secondPlayer.playerHand.size();
         }
 
@@ -312,7 +314,7 @@ public class Deck {
             if (deckOfCards.size() > 0) {
                 if (offender.playerHand.size() < 6) {
                     offender.playerHand.add(deckOfCards.remove(0));
-                } else if (defender.playerHand.size() < 6){
+                } else if (defender.playerHand.size() < 6) {
                     defender.playerHand.add(deckOfCards.remove(0));
                 }
                 Player interLude;
@@ -336,11 +338,11 @@ public class Deck {
                 return Stage.Draw;
             }
 
-            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 0) {
+            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > table.size()) {
                 return Stage.Victory;
             }
 
-            if (firstPlayer.playerHand.size() > 0 && secondPlayer.playerHand.size() == 0) {
+            if (firstPlayer.playerHand.size() > table.size() && secondPlayer.playerHand.size() == 0) {
                 return Stage.Loss;
             }
         }

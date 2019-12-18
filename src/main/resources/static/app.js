@@ -126,9 +126,17 @@ function render(gameState) {
         secondPlayerHand.append(text);
     }
 
+    if (gameState.stage !== "Continue"){
+        cardCounter.empty();
+        trumpLayer.empty();
+        firstPlayerHand.empty();
+        firstPlayerTable.empty();
+        secondPlayerTable.empty();
+        secondPlayerHand.empty();
+    }
+
     if (gameState.stage === "Victory") {
         alert("You won!");
-
     } else if (gameState.stage === "Loss") {
         alert("Human player lost!");
     } else if (gameState.stage === "Draw"){
