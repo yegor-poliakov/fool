@@ -3,20 +3,9 @@ const baseURL = "https://foolkyivbased.herokuapp.com/";
 var deckID = 0;
 function render(gameState) {
     deckID = gameState.deckID;
-    var cardsRemaining = gameState.remainingCards;
+    gameState = gameState;
     var cardCounter = $('#cards-remaining');
-    cardCounter.empty();
-    var trump = gameState.trump;
-    if(cardsRemaining != 0){
-        var remaining = "";
-        remaining += `<div class='cards-remaining'>Cards to go: ${cardsRemaining}</div>`;
-        cardCounter.append(remaining);
-    } else if (!(trump == undefined)) {
-        var remaining = "";
-        remaining += `<div class='cards-remaining'>Trump: ${trump}</div>`;
-        cardCounter.append(remaining);
-    }
-
+    renderStatus(gameState);
     var trumpLayer = $('#trump-layer');
     trumpLayer.empty();
     var trumpDeck = "";
@@ -127,23 +116,58 @@ function render(gameState) {
     }
 
     if (gameState.stage !== "Continue"){
-        cardCounter.empty();
         trumpLayer.empty();
+        cardCounter.empty();
+        renderStatus(gameState);
         firstPlayerHand.empty();
         firstPlayerTable.empty();
         secondPlayerTable.empty();
         secondPlayerHand.empty();
     }
 
-    if (gameState.stage === "Victory") {
-        alert("You won!");
-    } else if (gameState.stage === "Loss") {
-        alert("Human player lost!");
-    } else if (gameState.stage === "Draw"){
-        alert("Tie!");
-    }
+    endGame(gameState);
 
-    return false;
+}
+
+function renderStatus(gameState) {
+        var cardsRemaining = gameState.remainingCards;
+        var cardCounter = $('#cards-remaining');
+        cardCounter.empty();
+        if (gameState.stage === "Continue"){
+            var trump = gameState.trump;
+            if(cardsRemaining != 0){
+                var remaining = "";
+                remaining += `<div class='cards-remaining'>Cards to go: ${cardsRemaining}</div>`;
+                cardCounter.append(remaining);
+            } else if (!(trump == undefined)) {
+                var remaining = "";
+                remaining += `<div class='cards-remaining'>Trump: ${trump}</div>`;
+                cardCounter.append(remaining);
+            }
+        } else {
+            var disclaimer = "";
+            switch(gameState.stage) {
+              case "Victory":
+                    disclaimer += `<div class='cards-remaining' style='left:17%;top:30%;font-size:3em;'>Human victory</div>`;
+                    break;
+              case "Loss":
+                    disclaimer += `<div class='cards-remaining' style='left:17%;top:30%;font-size:3em;'>Skynet victory</div>`;
+                    break;
+              default:
+                    disclaimer += `<div class='cards-remaining' style='left:17%;top:30%;font-size:3em;'>Peace among worlds</div>`;
+            }
+            cardCounter.append(disclaimer);
+        }
+}
+
+function endGame(gameState){
+        if (gameState.stage === "Victory") {
+            alert("You won!");
+        } else if (gameState.stage === "Loss") {
+            alert("Human player lost!");
+        } else if (gameState.stage === "Draw"){
+            alert("Tie!");
+        }
 }
 
 function newGame(){

@@ -146,40 +146,26 @@ public class Deck {
     }
 
     public Stage attack(Player player, Card card) {
-        boolean aiResponse = false;
+        boolean aiResponse = (player == firstPlayer);
         boolean attackSuccess = false;
-        if (player == firstPlayer) {
-            aiResponse = true;
-        }
-
-        ArrayList<Card> hand1 = firstPlayer.playerHand;
-        ArrayList<Card> hand2 = secondPlayer.playerHand;
 
         if (table.size() == 0) {
             table.add(card);
             player.playerHand.remove(card);
             switchPlayers();
             attackSuccess = true;
-            if (endGame() != Stage.Continue) {
-                return endGame();
+        } else if (table.size() < 12) {
+            for (int i = 0; i < table.size(); i++) {
+                if (card.rank == table.get(i).rank) {
+                    table.add(card);
+                    player.playerHand.remove(card);
+                    switchPlayers();
+                    attackSuccess = true;
+                    break;
+                }
             }
         } else {
-            if ((table.size() % 2 == 0)) {
-                for (int i = 0; i < table.size(); i++) {
-                    if (card.rank == table.get(i).rank) {
-                        table.add(card);
-                        player.playerHand.remove(card);
-                        switchPlayers();
-                        attackSuccess = true;
-                        if (endGame() != Stage.Continue) {
-                            return endGame();
-                        }
-                        break;
-                    }
-                }
-            } else {
-                return Stage.Continue;
-            }
+            return Stage.Continue;
         }
 
         if (aiResponse && attackSuccess) {
@@ -201,10 +187,7 @@ public class Deck {
     }
 
     public Stage defend(Player player, Card card) {
-        boolean aiResponse = false;
-        if (player == firstPlayer) {
-            aiResponse = true;
-        }
+        boolean aiResponse = (player == firstPlayer);
 
         Card cardAttacking = new Card();
         if (table.size() % 2 == 1) {
@@ -215,11 +198,7 @@ public class Deck {
                 (cardAttacking.suit != card.suit && card.isTrump)) {
             table.add(card);
             player.playerHand.remove(card);
-            boolean emptyHand = (player.playerHand.size() == 0);
             switchPlayers();
-            if (table.size() == 12 || emptyHand){
-                retreat(player);
-            }
             if (endGame() != Stage.Continue) {
                 return endGame();
             }
@@ -243,16 +222,8 @@ public class Deck {
         return Stage.Continue;
     }
 
-
     public Stage retreat(Player player) {
-        boolean aiResponse = false;
-        if (player == firstPlayer) {
-            aiResponse = true;
-        }
-
-        if (endGame() != Stage.Continue) {
-            return endGame();
-        }
+        boolean aiResponse = (player == firstPlayer);
 
         if (table.size() % 2 == 0) {
             table.clear();
@@ -262,7 +233,7 @@ public class Deck {
         }
 
         if (aiResponse) {
-            if (secondPlayer.playerHand.size() > 0) {
+            if (secondPlayer.playerHand.size() > 0 && firstPlayer.playerHand.size() > 0) {
                 int attCardIndex = pickAttackCard(secondPlayer.playerHand);
                 attack(secondPlayer, secondPlayer.playerHand.get(attCardIndex));
             }
@@ -272,20 +243,17 @@ public class Deck {
     }
 
     public Stage giveUp(Player player) {
-        boolean aiResponse = false;
-        if (player == firstPlayer) {
-            aiResponse = true;
-        }
-
-        if (endGame() != Stage.Continue) {
-            return endGame();
-        }
+        boolean aiResponse = (player == firstPlayer);
 
         if (table.size() % 2 == 1) {
             player.playerHand.addAll(table);
             table.clear();
             switchPlayers();
             replenish();
+        }
+
+        if (endGame() != Stage.Continue) {
+            return endGame();
         }
 
         if (aiResponse) {
@@ -345,11 +313,11 @@ public class Deck {
                 return Stage.Draw;
             }
 
-            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 1) {
+            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 0) {
                 return Stage.Victory;
             }
 
-            if (firstPlayer.playerHand.size() > 1 && secondPlayer.playerHand.size() == 0) {
+            if (firstPlayer.playerHand.size() > 0 && secondPlayer.playerHand.size() == 0) {
                 return Stage.Loss;
             }
         }
