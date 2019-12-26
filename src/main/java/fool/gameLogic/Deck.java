@@ -117,7 +117,7 @@ public class Deck {
                 player = secondPlayer;
                 break;
             default:
-                throw new Exception("Someone has tried to feed false data instead of player number");
+                throw new Exception("Someone has tried to feed false data instead of a player number");
         }
         if (player.offence) {
             return attack(player, player.playerHand.get(cardNumber));
@@ -136,7 +136,7 @@ public class Deck {
                 player = secondPlayer;
                 break;
             default:
-                throw new Exception("Someone has tried to feed false data instead of player number");
+                throw new Exception("Someone has tried to feed false data instead of a player number");
         }
         if (player.offence) {
             return retreat(player);
@@ -160,6 +160,9 @@ public class Deck {
             player.playerHand.remove(card);
             switchPlayers();
             attackSuccess = true;
+            if (endGame() != Stage.Continue) {
+                return endGame();
+            }
         } else {
             if ((table.size() % 2 == 0)) {
                 for (int i = 0; i < table.size(); i++) {
@@ -212,7 +215,11 @@ public class Deck {
                 (cardAttacking.suit != card.suit && card.isTrump)) {
             table.add(card);
             player.playerHand.remove(card);
+            boolean emptyHand = (player.playerHand.size() == 0);
             switchPlayers();
+            if (table.size() == 12 || emptyHand){
+                retreat(player);
+            }
             if (endGame() != Stage.Continue) {
                 return endGame();
             }
@@ -243,15 +250,15 @@ public class Deck {
             aiResponse = true;
         }
 
+        if (endGame() != Stage.Continue) {
+            return endGame();
+        }
+
         if (table.size() % 2 == 0) {
             table.clear();
             switchOffender();
             switchPlayers();
             replenish();
-        }
-
-        if (endGame() != Stage.Continue) {
-            return endGame();
         }
 
         if (aiResponse) {
@@ -270,15 +277,15 @@ public class Deck {
             aiResponse = true;
         }
 
+        if (endGame() != Stage.Continue) {
+            return endGame();
+        }
+
         if (table.size() % 2 == 1) {
             player.playerHand.addAll(table);
             table.clear();
             switchPlayers();
             replenish();
-        }
-
-        if (endGame() != Stage.Continue) {
-            return endGame();
         }
 
         if (aiResponse) {
@@ -338,11 +345,11 @@ public class Deck {
                 return Stage.Draw;
             }
 
-            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > table.size()) {
+            if (firstPlayer.playerHand.size() == 0 && secondPlayer.playerHand.size() > 1) {
                 return Stage.Victory;
             }
 
-            if (firstPlayer.playerHand.size() > table.size() && secondPlayer.playerHand.size() == 0) {
+            if (firstPlayer.playerHand.size() > 1 && secondPlayer.playerHand.size() == 0) {
                 return Stage.Loss;
             }
         }

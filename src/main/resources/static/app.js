@@ -33,7 +33,7 @@ function render(gameState) {
     firstPlayerHand.empty();
     var endButton1 = $("#end-button1");
     endButton1.empty();
-    if(gameState.firstPlayerActive){
+    if(gameState.firstPlayerActive && gameState.stage === "Continue"){
         text = "<div class='button' onclick='makeMove(0, -1)'></div>";
         endButton1.append(text);
     }
@@ -101,7 +101,7 @@ function render(gameState) {
     secondPlayerHand.empty();
     var endButton2 = $("#end-button2");
     endButton2.empty();
-    if(gameState.secondPlayerActive){
+    if(gameState.secondPlayerActive && gameState.stage === "Continue"){
         text = "<div class='button' onclick='makeMove(1, -1)'></div>";
         endButton2.append(text);
     }
